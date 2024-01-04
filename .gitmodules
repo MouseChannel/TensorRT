@@ -8,5 +8,5 @@
 	branch = 1.8.0
 [submodule "parsers/onnx"]
 	path = parsers/onnx
-	url = https://github.com/MouseChannel/onnx-tensorrt.git
+	url = git@github.com:MouseChannel/onnx-tensorrt.git
 	branch = main
