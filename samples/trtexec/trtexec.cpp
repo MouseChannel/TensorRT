@@ -64,7 +64,7 @@ std::string const kMANGLED_CAFFE_PARSER_CREATE_NAME{"?createCaffeParser@nvcaffep
 std::string const kMANGLED_UFF_PARSER_SHUTDOWN_NAME{"?shutdownProtobufLibrary@nvuffparser@@YAXXZ"};
 std::string const kMANGLED_CAFFE_PARSER_SHUTDOWN_NAME{"?shutdownProtobufLibrary@nvcaffeparser1@@YAXXZ"};
 #else
-std::string const kNVINFER_PLUGIN_LIBNAME = std::string{"libnvinfer_plugin.so."} + std::to_string(NV_TENSORRT_MAJOR);
+std::string const kNVINFER_PLUGIN_LIBNAME = std::string{"/home/mocheng/project/TensorRT/cmake-build-debug/libnvinfer_plugin_debug.so."} + std::to_string(NV_TENSORRT_MAJOR);
 std::string const kNVINFER_LIBNAME = std::string{"libnvinfer.so."} + std::to_string(NV_TENSORRT_MAJOR);
 std::string const kNVONNXPARSER_LIBNAME = std::string{"libnvonnxparser.so."} + std::to_string(NV_TENSORRT_MAJOR);
 std::string const kNVPARSERS_LIBNAME = std::string{"libnvparsers.so."} + std::to_string(NV_TENSORRT_MAJOR);
