@@ -19,8 +19,14 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 include(cmake/modules/set_ifndef.cmake)
 include(cmake/modules/find_library_create_target.cmake)
 
-set_ifndef(TRT_LIB_DIR ${CMAKE_BINARY_DIR})
-set_ifndef(TRT_OUT_DIR ${CMAKE_BINARY_DIR})
+#set_ifndef(TRT_LIB_DIR ${CMAKE_BINARY_DIR})
+#set_ifndef(TRT_OUT_DIR ${CMAKE_BINARY_DIR})
+set_ifndef(TRT_LIB_DIR /home/mocheng/software/TensorRT-8.6.1.6/lib)
+
+#set_ifndef(TRT_OUT_DIR ${CMAKE_BINARY_DIR})
+set_ifndef(TRT_OUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake-build-debug)
+
+
 
 file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/include/NvInferVersion.h" VERSION_STRINGS REGEX "#define NV_TENSORRT_.*")
 
@@ -44,7 +50,8 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 
 set(CMAKE_SKIP_BUILD_RPATH True)
-
+set(CMAKE_CUDA_ARCHITECTURES 75)
+set(CMAKE_CUDA_COMPILER /usr/local/cuda/bin/nvcc)
 project(TensorRT
         LANGUAGES CXX CUDA
         VERSION ${TRT_VERSION}
