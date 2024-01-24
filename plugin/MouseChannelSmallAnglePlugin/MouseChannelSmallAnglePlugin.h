@@ -1,17 +1,18 @@
-#ifndef MOUSECHANNEL_SELECT_PLUGIN
-#define MOUSECHANNEL_SELECT_PLUGIN
+#ifndef MOUSECHANNEL_SMALLANGLE_PLUGIN
+#define MOUSECHANNEL_SMALLANGLE_PLUGIN
 #include "common/plugin.h"
 #include <cublas_v2.h>
 namespace nvinfer1
 {
 namespace plugin
 {
-void RealSelect(float const* input, float const* onehot, float* output,int onehot_count);
-class MouseChannelSelect : public IPluginV2DynamicExt
+void RealHandle(
+    float* sin_half_angles_over_angles, float const* small_angles, const float* angles, float* output, int count);
+class MouseChannelSmallAngle : public IPluginV2DynamicExt
 {
 public:
-    MouseChannelSelect();
-    ~MouseChannelSelect() override = default;
+    MouseChannelSmallAngle();
+    ~MouseChannelSmallAngle() override = default;
     char const* getPluginType() const noexcept override;
 
     char const* getPluginVersion() const noexcept override;
@@ -56,23 +57,20 @@ public:
     // void detachFromContext() noexcept override;
 private:
     cublasHandle_t mCublas;
-    float** dd_A = NULL;
-
-    float** dd_InvA = NULL;
-    int* info;
+ 
     std::string mPluginNamespace;
 };
 
-class MouseChannelSelectPluginCreater : public nvinfer1::IPluginCreator
+class MouseChannelSmallAnglePluginCreater : public nvinfer1::IPluginCreator
 {
 public:
-    MouseChannelSelectPluginCreater();
-    ~MouseChannelSelectPluginCreater() override = default;
+    MouseChannelSmallAnglePluginCreater();
+    ~MouseChannelSmallAnglePluginCreater() override = default;
     char const* getPluginName() const noexcept override;
 
     char const* getPluginVersion() const noexcept override;
     void setPluginNamespace(char const* pluginNamespace) noexcept override;
-     char const*  getPluginNamespace() const noexcept override;
+    char const* getPluginNamespace() const noexcept override;
 
     PluginFieldCollection const* getFieldNames() noexcept override;
 

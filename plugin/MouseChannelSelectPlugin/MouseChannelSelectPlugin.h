@@ -1,17 +1,17 @@
-#ifndef MOUSECHANNEL_INVERSE_PLUGIN
-#define MOUSECHANNEL_INVERSE_PLUGIN
+#ifndef MOUSECHANNEL_SELECT_PLUGIN
+#define MOUSECHANNEL_SELECT_PLUGIN
 #include "common/plugin.h"
 #include <cublas_v2.h>
 namespace nvinfer1
 {
 namespace plugin
 {
-
-class MouseChannelInverse : public IPluginV2DynamicExt
+void RealSelect(float const* input, float const* onehot, float* output,int onehot_count);
+class MouseChannelSelect : public IPluginV2DynamicExt
 {
 public:
-    MouseChannelInverse();
-    ~MouseChannelInverse() override = default;
+    MouseChannelSelect();
+    ~MouseChannelSelect() override = default;
     char const* getPluginType() const noexcept override;
 
     char const* getPluginVersion() const noexcept override;
@@ -56,18 +56,14 @@ public:
     // void detachFromContext() noexcept override;
 private:
     cublasHandle_t mCublas;
-    float** dd_A = NULL;
-
-    float** dd_InvA = NULL;
-    int* info;
     std::string mPluginNamespace;
 };
 
-class MouseChannelInversePluginCreater : public nvinfer1::IPluginCreator
+class MouseChannelSelectPluginCreater : public nvinfer1::IPluginCreator
 {
 public:
-    MouseChannelInversePluginCreater();
-    ~MouseChannelInversePluginCreater() override = default;
+    MouseChannelSelectPluginCreater();
+    ~MouseChannelSelectPluginCreater() override = default;
     char const* getPluginName() const noexcept override;
 
     char const* getPluginVersion() const noexcept override;

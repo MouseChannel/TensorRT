@@ -70,6 +70,8 @@ set(PLUGIN_LISTS
         splitPlugin
         voxelGeneratorPlugin
         MouseChannelInversePlugin
+        MouseChannelSelectPlugin
+        MouseChannelSmallAnglePlugin
 )
 
 # Add BERT sources if ${BERT_GENCODES} was populated

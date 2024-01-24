@@ -17,7 +17,8 @@ MouseChannelInverse::MouseChannelInverse()
     auto dd_1 = cudaMalloc(&dd_A, sizeof(float*));
     auto dd_2 = cudaMalloc(&dd_InvA, sizeof(float*));
     auto a_info = cudaMalloc((void**) &info, 4);
-    std::cout << "🎉🎉" << dd_1 << dd_1 << a_info << std::endl;
+    std::cout << "🎉🎉"
+              << "I'm MouseChannelInverse Plugin" << std::endl;
 }
 char const* MouseChannelInverse::getPluginType() const noexcept
 {
@@ -31,27 +32,33 @@ int32_t MouseChannelInverse::getNbOutputs() const noexcept
 {
     return 1;
 }
-Dims MouseChannelInverse::getOutputDimensions(int32_t index, Dims const* inputs, int32_t nbInputDims) noexcept
+DimsExprs MouseChannelInverse::getOutputDimensions(
+    int32_t outputIndex, DimsExprs const* inputs, int32_t nbInputs, IExprBuilder& exprBuilder) noexcept
 {
-    // Dims res;
-    // res.nbDims = 1;
-    // res.d[0] = inputs[0].d[0];
-    // res.d[1] = inputs[0].d[1];
-    return inputs[0];
+    DimsExprs out_dim;
+    out_dim.nbDims = 3;
+    out_dim.d[0] = inputs[0].d[0];
+
+    out_dim.d[1] = inputs[0].d[1];
+
+    out_dim.d[2] = inputs[0].d[2];
+
+    return out_dim;
 }
 int32_t MouseChannelInverse::initialize() noexcept
 {
     return STATUS_SUCCESS;
 }
 void MouseChannelInverse::terminate() noexcept {}
-size_t MouseChannelInverse::getWorkspaceSize(int32_t maxBatchSize) const noexcept
+size_t MouseChannelInverse::getWorkspaceSize(
+    PluginTensorDesc const* inputs, int32_t nbInputs, PluginTensorDesc const* outputs, int32_t nbOutputs) const noexcept
 {
     return 120;
 }
-int32_t MouseChannelInverse::enqueue(
-    int32_t batchSize, void const* const* inputs, void* const* outputs, void* workspace, cudaStream_t stream) noexcept
+int32_t MouseChannelInverse::enqueue(PluginTensorDesc const* inputDesc, PluginTensorDesc const* outputDesc,
+    void const* const* inputs, void* const* outputs, void* workspace, cudaStream_t stream) noexcept
 {
-     
+
     if (cudaMemcpy(dd_A, inputs, sizeof(float*), cudaMemcpyKind::cudaMemcpyHostToDevice) != cudaSuccess)
     {
         std::cout << "err" << std::endl;
@@ -72,10 +79,10 @@ size_t MouseChannelInverse::getSerializationSize() const noexcept
     return 0;
 }
 void MouseChannelInverse::serialize(void* buffer) const noexcept {}
-bool MouseChannelInverse::supportsFormat(DataType type, PluginFormat format) const noexcept
-{
-    return (type == DataType::kFLOAT && format == PluginFormat::kLINEAR);
-}
+// bool MouseChannelInverse::supportsFormat(DataType type, PluginFormat format) const noexcept
+// {
+//     return (type == DataType::kFLOAT && format == PluginFormat::kLINEAR);
+// }
 void MouseChannelInverse::destroy() noexcept
 {
     delete this;
@@ -94,31 +101,35 @@ DataType MouseChannelInverse::getOutputDataType(
     PLUGIN_ASSERT(index == 0);
     return DataType::kFLOAT;
 }
-bool MouseChannelInverse::isOutputBroadcastAcrossBatch(
-    int32_t outputIndex, bool const* inputIsBroadcasted, int32_t nbInputs) const noexcept
-{
-    return false;
-}
-bool MouseChannelInverse::canBroadcastInputAcrossBatch(int32_t inputIndex) const noexcept
-{
-    return false;
-}
+// bool MouseChannelInverse::isOutputBroadcastAcrossBatch(
+//     int32_t outputIndex, bool const* inputIsBroadcasted, int32_t nbInputs) const noexcept
+// {
+//     return false;
+// }
+// bool MouseChannelInverse::canBroadcastInputAcrossBatch(int32_t inputIndex) const noexcept
+// {
+//     return false;
+// }
 void MouseChannelInverse::attachToContext(
     cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) noexcept
 {
     mCublas = cublasContext;
 }
-void MouseChannelInverse::configurePlugin(Dims const* inputDims, int32_t nbInputs, Dims const* outputDims,
-    int32_t nbOutputs, DataType const* inputTypes, DataType const* outputTypes, bool const* inputIsBroadcast,
-    bool const* outputIsBroadcast, PluginFormat floatFormat, int32_t maxBatchSize) noexcept
+void MouseChannelInverse::configurePlugin(
+    DynamicPluginTensorDesc const* in, int32_t nbInputs, DynamicPluginTensorDesc const* out, int32_t nbOutputs) noexcept
 {
 }
+bool MouseChannelInverse::supportsFormatCombination(
+    int32_t pos, PluginTensorDesc const* inOut, int32_t nbInputs, int32_t nbOutputs) noexcept
+{
+    return inOut[0].type == DataType::kFLOAT;
+}
 
-IPluginV2Ext* MouseChannelInverse::clone() const noexcept
+IPluginV2DynamicExt* MouseChannelInverse::clone() const noexcept
 {
     try
     {
-        IPluginV2Ext* plugin = new MouseChannelInverse;
+        IPluginV2DynamicExt* plugin = new MouseChannelInverse;
         plugin->setPluginNamespace(mPluginNamespace.c_str());
         return plugin;
     }
@@ -138,16 +149,25 @@ char const* MouseChannelInversePluginCreater::getPluginVersion() const noexcept
 {
     return kMouseChannelInverse_PLUGIN_VERSION;
 }
+void MouseChannelInversePluginCreater::setPluginNamespace(char const* pluginNamespace) noexcept
+{
+    mNamespace = pluginNamespace;
+}
+char const* MouseChannelInversePluginCreater::getPluginNamespace() const noexcept
+{
+    return mNamespace.c_str();
+}
 PluginFieldCollection const* MouseChannelInversePluginCreater::getFieldNames() noexcept
 {
     return &mFC;
 }
-IPluginV2Ext* MouseChannelInversePluginCreater::createPlugin(char const* name, PluginFieldCollection const* fc) noexcept
+IPluginV2DynamicExt* MouseChannelInversePluginCreater::createPlugin(
+    char const* name, PluginFieldCollection const* fc) noexcept
 {
     try
     {
 
-        MouseChannelInverse* obj = new MouseChannelInverse;
+        auto* obj = new MouseChannelInverse;
         obj->setPluginNamespace(mNamespace.c_str());
         return obj;
     }
@@ -157,12 +177,12 @@ IPluginV2Ext* MouseChannelInversePluginCreater::createPlugin(char const* name, P
     }
     return nullptr;
 }
-IPluginV2Ext* MouseChannelInversePluginCreater::deserializePlugin(
+IPluginV2DynamicExt* MouseChannelInversePluginCreater::deserializePlugin(
     char const* name, void const* serialData, size_t serialLength) noexcept
 {
     try
     {
-        MouseChannelInverse* obj = new MouseChannelInverse;
+        auto* obj = new MouseChannelInverse;
         obj->setPluginNamespace(mNamespace.c_str());
         return obj;
     }
